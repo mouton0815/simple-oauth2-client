@@ -1,0 +1,10 @@
+provider: Strava
+clientId: 'insert client id here'
+clientSecret: 'insert client secret here'
+authHost: https://www.strava.com
+authPath: /oauth/authorize
+tokenHost: https://www.strava.com
+tokenPath: /oauth/token
+scopes:
+  - activity:read
+  - activity:write

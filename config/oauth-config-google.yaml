@@ -1,0 +1,9 @@
+provider: Google
+clientId: 'insert client id here'
+clientSecret: 'insert client secret here'
+authHost: https://accounts.google.com
+authPath: /o/oauth2/v2/auth
+tokenHost: https://www.googleapis.com
+tokenPath: /oauth2/v4/token
+scopes:
+  - https://www.googleapis.com/auth/userinfo.profile

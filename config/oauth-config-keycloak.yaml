@@ -1,0 +1,7 @@
+provider: Keycloak
+clientId: 'insert client id here'
+clientSecret: 'insert client secret here'
+authHost: http://localhost:8080
+authPath: /realms/demo/protocol/openid-connect/auth
+tokenHost: http://localhost:8080
+tokenPath: /realms/demo/protocol/openid-connect/token
