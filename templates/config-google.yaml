@@ -7,3 +7,4 @@ tokenHost: https://www.googleapis.com
 tokenPath: /oauth2/v4/token
 scopes:
   - https://www.googleapis.com/auth/userinfo.profile
+  - https://www.googleapis.com/auth/userinfo.email

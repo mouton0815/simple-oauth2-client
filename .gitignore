@@ -1,4 +1,4 @@
 package-lock.json
 node_modules/
-config/oauth-config.yaml
+config.yaml
 .idea/

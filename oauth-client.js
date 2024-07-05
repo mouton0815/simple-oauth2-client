@@ -31,10 +31,14 @@ const client = new AuthorizationCode({
     }
 })
 
+// Unfortunately, different OAuth providers expect different scope separators
+const scopeSeparator = config.provider === 'Strava' ? ',' : ' '
+const scope = config.scopes && config.scopes.join(scopeSeparator)
+
 const authorizeUrl = client.authorizeURL({
     redirect_uri: REDIRECT_URI,
     state: '3(#0/!~',
-    ...(config.scopes && { scope: config.scopes.join(',') })
+    ...(scope && { scope })
 })
 
 //
@@ -85,11 +89,11 @@ app.listen(PORT, (err) => {
 
 function parseConfig() {
     try {
-        const conf = fs.readFileSync('./config/oauth-config.yaml', 'utf8')
+        const conf = fs.readFileSync('./config.yaml', 'utf8')
         return yaml.parse(conf)
     } catch (e) {
         console.error(e.message)
-        console.info('Please copy one of the ./config/oauth-config-*.yaml templates to ./config/oauth-config.yaml and adapt the content!')
+        console.info('Please copy one of the ./templates/config-*.yaml templates to ./config.yaml and adapt the content!')
         process.exit(-1)
     }
 }
