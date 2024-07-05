@@ -1,0 +1,10 @@
+provider: GitHub
+clientId: 'insert client id here'
+clientSecret: 'insert client secret here'
+authHost: https://github.com
+authPath: /login/oauth/authorize
+tokenHost: https://github.com
+tokenPath: /login/oauth/access_token
+scopes:
+  - repo
+  - user

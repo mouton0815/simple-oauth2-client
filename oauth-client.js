@@ -101,14 +101,16 @@ function parseConfig() {
 // Unfortunately, the token content is very specific to the auth provider
 function decodeToken(provider, token) {
     switch (provider) {
-        case 'Strava':
-            return token.athlete
+        case 'GitHub':
+            return token // Nothing to decode
         case 'Google':
             return jwtDecode(token.id_token)
         case 'Keycloak':
             return jwtDecode(token.access_token)
+        case 'Strava':
+            return token.athlete
         default:
-            console.warn('Unknown auth provider ', config)
+            console.warn('Unknown auth provider ', provider)
             return token
     }
 }
