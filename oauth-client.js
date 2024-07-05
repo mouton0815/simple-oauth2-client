@@ -9,25 +9,11 @@ import fs from 'fs'
 const PORT = 2525
 const REDIRECT_URI = `http://localhost:${PORT}/auth_callback`
 
-function parseConfig() {
-    try {
-        const conf = fs.readFileSync('./config/oauth-config.yaml', 'utf8')
-        return yaml.parse(conf)
-    } catch (e) {
-        console.error(e.message)
-        console.info('Please copy one of the ./config/oauth-config-*.yaml templates to ./config/oauth-config.yaml and adapt the content!')
-        process.exit(-1)
-    }
-}
-
-// Unfortunately, the token content is very specific to the auth provider
-function decodeToken(token) {
-    return token.athlete // Strava
-        || jwtDecode(token.id_token // Google
-            || token.access_token) // Keycloak
-}
-
 const config = parseConfig()
+
+//
+// OAuth client config
+//
 
 const client = new AuthorizationCode({
     client: {
@@ -45,21 +31,21 @@ const client = new AuthorizationCode({
     }
 })
 
-
-const authParams = {
+const authorizeUrl = client.authorizeURL({
     redirect_uri: REDIRECT_URI,
     state: '3(#0/!~',
-}
-if (config.scopes) {
-    authParams.scope = config.scopes.join(',')
-}
-const authUri = client.authorizeURL(authParams)
+    ...(config.scopes && { scope: config.scopes.join(',') })
+})
+
+//
+// Express app setup
+//
 
 const app = express()
 
 app.get('/authorize', (req, res) => {
-    console.log(authUri)
-    res.redirect(authUri)
+    console.log(authorizeUrl)
+    res.redirect(authorizeUrl)
 })
 
 // Callback service parsing the authorization token and asking for the access token
@@ -73,7 +59,7 @@ app.get('/auth_callback', async (req, res) => {
     try {
         const token = await client.getToken(tokenParams)
         console.log('Token:', token.token)
-        const decoded = decodeToken(token.token)
+        const decoded = decodeToken(config.provider, token.token)
         const formatted = `<body><pre>${JSON.stringify(decoded, null, 4)}</pre></body>`
         return res.status(200).send(formatted)
     } catch (error) {
@@ -92,3 +78,33 @@ app.listen(PORT, (err) => {
     }
     console.log(`Simple OAuth2 client listening at http://localhost:${PORT}`)
 })
+
+//
+// Helper functions
+//
+
+function parseConfig() {
+    try {
+        const conf = fs.readFileSync('./config/oauth-config.yaml', 'utf8')
+        return yaml.parse(conf)
+    } catch (e) {
+        console.error(e.message)
+        console.info('Please copy one of the ./config/oauth-config-*.yaml templates to ./config/oauth-config.yaml and adapt the content!')
+        process.exit(-1)
+    }
+}
+
+// Unfortunately, the token content is very specific to the auth provider
+function decodeToken(provider, token) {
+    switch (provider) {
+        case 'Strava':
+            return token.athlete
+        case 'Google':
+            return jwtDecode(token.id_token)
+        case 'Keycloak':
+            return jwtDecode(token.access_token)
+        default:
+            console.warn('Unknown auth provider ', config)
+            return token
+    }
+}
